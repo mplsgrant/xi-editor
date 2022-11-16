@@ -338,7 +338,7 @@ impl MetadataType {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
 pub struct SampleArgs {
     /// An arbitrary payload to associate with the sample.  The type is
     /// controlled by features (default string).
@@ -823,7 +823,7 @@ impl Trace {
             return Err(chrome_trace_dump::Error::already_exists());
         }
 
-        let mut trace_file = fs::File::create(&path)?;
+        let mut trace_file = fs::File::create(path)?;
 
         chrome_trace_dump::serialize(&traces, &mut trace_file)
     }

@@ -287,7 +287,7 @@ impl<N: NodeInfo> Node<N> {
     fn is_ok_child(&self) -> bool {
         match self.0.val {
             NodeVal::Leaf(ref l) => l.is_ok_child(),
-            NodeVal::Internal(ref nodes) => (nodes.len() >= MIN_CHILDREN),
+            NodeVal::Internal(ref nodes) => nodes.len() >= MIN_CHILDREN,
         }
     }
 
@@ -407,7 +407,7 @@ impl<N: NodeInfo> Node<N> {
         // the m1 boundary. Otherwise, we can land on the beginning of
         // the leaf immediately following the M1 boundary, which may be
         // more efficient.
-        let m1_fudge = if M1::can_fragment() { 1 } else { 0 };
+        let m1_fudge = usize::from(M1::can_fragment());
         let mut m2 = 0;
         let mut node = self;
         while node.height() > 0 {

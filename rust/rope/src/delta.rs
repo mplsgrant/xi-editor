@@ -625,7 +625,7 @@ pub struct InsertsIter<'a, N: NodeInfo + 'a> {
     els_iter: slice::Iter<'a, DeltaElement<N>>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct DeltaRegion {
     pub old_offset: usize,
     pub new_offset: usize,
