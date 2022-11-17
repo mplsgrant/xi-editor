@@ -19,8 +19,9 @@ use std::io::Write;
 use std::process;
 
 use jsonrpc_lite::{Error, Id, JsonRpc, Params};
+use lsp_types::ServerCapabilities;
+use lsp_types::Url;
 use serde_json::{to_value, Value};
-use url::Url;
 use xi_plugin_lib::CoreProxy;
 
 use crate::lsp_types::*;
@@ -76,7 +77,7 @@ impl LanguageServerClient {
             result_queue,
             status_items: HashSet::new(),
             language_id,
-            server_capabilities: None,
+            server_capabilities: None::<ServerCapabilities>,
             opened_documents: HashMap::new(),
             file_extensions,
         }
@@ -190,14 +191,17 @@ impl LanguageServerClient {
     {
         let client_capabilities = ClientCapabilities::default();
 
+        #[allow(deprecated)]
         let init_params = InitializeParams {
-            process_id: Some(u64::from(process::id())),
+            process_id: Some(process::id()),
             root_uri,
             root_path: None,
             initialization_options: None,
             capabilities: client_capabilities,
-            trace: Some(TraceOption::Verbose),
+            trace: Some(TraceValue::Verbose),
             workspace_folders: None,
+            client_info: None,
+            locale: None,
         };
 
         let params = Params::from(serde_json::to_value(init_params).unwrap());
@@ -238,12 +242,12 @@ impl LanguageServerClient {
         &mut self,
         view_id: ViewId,
         changes: Vec<TextDocumentContentChangeEvent>,
-        version: u64,
+        version: i32,
     ) {
         let text_document_did_change_params = DidChangeTextDocumentParams {
             text_document: VersionedTextDocumentIdentifier {
                 uri: self.opened_documents[&view_id].clone(),
-                version: Some(version),
+                version,
             },
             content_changes: changes,
         };
@@ -258,6 +262,7 @@ impl LanguageServerClient {
         // and is optional in LSP Specification
         let text_document_did_save_params = DidSaveTextDocumentParams {
             text_document: TextDocumentIdentifier { uri: self.opened_documents[&view_id].clone() },
+            text: None,
         };
         let params = Params::from(serde_json::to_value(text_document_did_save_params).unwrap());
         self.send_notification("textDocument/didSave", params);
@@ -285,7 +290,7 @@ impl LanguageServerClient {
     pub fn get_sync_kind(&mut self) -> TextDocumentSyncKind {
         match self.server_capabilities.as_ref().and_then(|c| c.text_document_sync.as_ref()) {
             Some(&TextDocumentSyncCapability::Kind(kind)) => kind,
-            _ => TextDocumentSyncKind::Full,
+            _ => TextDocumentSyncKind::FULL,
         }
     }
 }

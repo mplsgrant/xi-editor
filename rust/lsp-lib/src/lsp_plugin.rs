@@ -18,7 +18,7 @@ use std::collections::HashMap;
 use std::path::Path;
 use std::sync::{Arc, Mutex};
 
-use url::Url;
+use lsp_types::Url;
 use xi_plugin_lib::{ChunkCache, CoreProxy, Plugin, View};
 use xi_rope::rope::RopeDelta;
 
@@ -80,7 +80,7 @@ impl Plugin for LspPlugin {
             let sync_kind = ls_client.get_sync_kind();
             view_info.version += 1;
             if let Some(changes) = get_change_for_sync_kind(sync_kind, view, delta) {
-                ls_client.send_did_change(view.get_id(), changes, view_info.version);
+                ls_client.send_did_change(view.get_id(), changes, view_info.version as i32);
             }
         }
     }
@@ -207,7 +207,7 @@ impl LspPlugin {
     ) -> Option<(String, Arc<Mutex<LanguageServerClient>>)> {
         workspace_root
             .clone()
-            .map(|r| r.into_string())
+            .map(|r| r.to_string())
             .or_else(|| {
                 let config = &self.config.language_config[language_id];
                 if config.supports_single_file {

@@ -18,7 +18,7 @@ use std::path::Path;
 use std::process::{Command, Stdio};
 use std::sync::{Arc, Mutex};
 
-use url::Url;
+use lsp_types::Url;
 use xi_plugin_lib::{Cache, ChunkCache, CoreProxy, Error as PluginLibError, View};
 use xi_rope::rope::RopeDelta;
 
@@ -49,7 +49,7 @@ pub fn get_document_content_changes<C: Cache>(
                     start: get_position_of_offset(view, start)?,
                     end: get_position_of_offset(view, end)?,
                 }),
-                range_length: Some((end - start) as u64),
+                range_length: Some((end - start) as u32),
                 text,
             };
 
@@ -75,7 +75,7 @@ pub fn get_document_content_changes<C: Cache>(
                     start: get_position_of_offset(view, start)?,
                     end: end_position,
                 }),
-                range_length: Some((end - start) as u64),
+                range_length: Some((end - start) as u32),
                 text: String::new(),
             };
 
@@ -100,8 +100,8 @@ pub fn get_change_for_sync_kind(
     delta: Option<&RopeDelta>,
 ) -> Option<Vec<TextDocumentContentChangeEvent>> {
     match sync_kind {
-        TextDocumentSyncKind::None => None,
-        TextDocumentSyncKind::Full => {
+        TextDocumentSyncKind::NONE => None,
+        TextDocumentSyncKind::FULL => {
             let text_document_content_change_event = TextDocumentContentChangeEvent {
                 range: None,
                 range_length: None,
@@ -109,7 +109,7 @@ pub fn get_change_for_sync_kind(
             };
             Some(vec![text_document_content_change_event])
         }
-        TextDocumentSyncKind::Incremental => match get_document_content_changes(delta, view) {
+        TextDocumentSyncKind::INCREMENTAL => match get_document_content_changes(delta, view) {
             Ok(result) => Some(result),
             Err(err) => {
                 warn!("Error: {:?} Occured. Sending Whole Doc", err);
@@ -121,6 +121,7 @@ pub fn get_change_for_sync_kind(
                 Some(vec![text_document_content_change_event])
             }
         },
+        _ => None,
     }
 }
 
