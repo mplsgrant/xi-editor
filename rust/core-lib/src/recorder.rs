@@ -260,8 +260,7 @@ mod tests {
         }
 
         recorder.play(&recording_name, |_| {
-            // We shouldn't have any events to play since nothing was saved!
-            assert!(false);
+            unreachable!("We shouldn't have any events to play since nothing was saved!")
         });
     }
 
@@ -285,8 +284,9 @@ mod tests {
 
         recorder.toggle_recording(Some(recording_name.clone()));
         recorder.play(&recording_name, |_| {
-            // We shouldn't be able to play a recording while recording with the same name
-            assert!(false);
+            unreachable!(
+                "We shouldn't be able to play a recording while recording with the same name"
+            );
         });
     }
 

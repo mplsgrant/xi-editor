@@ -34,7 +34,7 @@ pub struct StackMap {
     scopes: Node,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 /// Result type for `StackMap` lookups. Used to communicate to the user
 /// whether or not a new identifier has been assigned, which will need to
 /// be communicated to the peer.

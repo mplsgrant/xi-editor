@@ -22,7 +22,7 @@ use crate::word_boundaries::WordCursor;
 use xi_rope::{Cursor, LinesMetric, Rope};
 
 /// The specification of a movement.
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum Movement {
     /// Move to the left by one grapheme cluster.
     Left,

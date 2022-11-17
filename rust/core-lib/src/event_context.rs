@@ -320,7 +320,7 @@ impl<'a> EventContext<'a> {
         let undo_group = ed.get_active_undo_group();
         //TODO: we want to just put EditType on the wire, but don't want
         //to update the plugin lib quite yet.
-        let v: Value = serde_json::to_value(&ed.get_edit_type()).unwrap();
+        let v: Value = serde_json::to_value(ed.get_edit_type()).unwrap();
         let edit_type_str = v.as_str().unwrap().to_string();
 
         let update = PluginUpdate::new(
@@ -711,6 +711,8 @@ impl<'a> EventContext<'a> {
 #[cfg(test)]
 #[rustfmt::skip]
 mod tests {
+    use std::cmp::Ordering;
+
     use super::*;
     use crate::config::ConfigManager;
     use crate::core::dummy_weak_core;
@@ -760,15 +762,23 @@ mod tests {
             let mut text: String = b.get_buffer().into();
             let v = self.view.borrow();
             for sel in v.sel_regions().iter().rev() {
-                if sel.end == sel.start {
-                    text.insert(sel.end, '|');
-                } else if sel.end > sel.start {
-                    text.insert_str(sel.end, "|]");
-                    text.insert(sel.start, '[');
-                } else {
-                    text.insert(sel.start, ']');
-                    text.insert_str(sel.end, "[|");
+
+                match sel.end.cmp(&sel.start) {
+                    Ordering::Equal => text.insert(sel.end, '|'),
+                    Ordering::Greater =>  {text.insert_str(sel.end, "|]");
+                                                               text.insert(sel.start, '[');}
+                    Ordering::Less =>  {                    text.insert(sel.start, ']');
+                    text.insert_str(sel.end, "[|");}
                 }
+                // if sel.end == sel.start {
+                //     text.insert(sel.end, '|');
+                // } else if sel.end > sel.start {
+                //     text.insert_str(sel.end, "|]");
+                //     text.insert(sel.start, '[');
+                // } else {
+                //     text.insert(sel.start, ']');
+                //     text.insert_str(sel.end, "[|");
+                // }
             }
             text
         }

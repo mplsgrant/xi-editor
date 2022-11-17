@@ -26,7 +26,7 @@ use crate::view::View;
 use crate::xi_rope::spans::Spans;
 use crate::xi_rope::{Interval, Rope};
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
 pub enum AnnotationType {
     Selection,
     Find,
@@ -45,7 +45,7 @@ impl AnnotationType {
 
 /// Location and range of an annotation ([start_line, start_col, end_line, end_col]).
 /// Location and range of an annotation
-#[derive(Debug, Default, Clone, Copy, PartialEq)]
+#[derive(Debug, Default, Clone, Copy, Eq, PartialEq)]
 pub struct AnnotationRange {
     pub start_line: usize,
     pub start_col: usize,

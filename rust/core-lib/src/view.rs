@@ -130,7 +130,7 @@ enum FindProgress {
 }
 
 /// Contains replacement string and replace options.
-#[derive(Debug, Default, PartialEq, Serialize, Deserialize, Clone)]
+#[derive(Debug, Default, Eq, PartialEq, Serialize, Deserialize, Clone)]
 pub struct Replace {
     /// Replacement string.
     pub chars: String,
@@ -427,7 +427,7 @@ impl View {
     pub fn invalidate_styles(&mut self, text: &Rope, start: usize, end: usize) {
         let first_line = self.line_of_offset(text, start);
         let (mut last_line, last_col) = self.offset_to_line_col(text, end);
-        last_line += if last_col > 0 { 1 } else { 0 };
+        last_line += usize::from(last_col > 0);
         self.lc_shadow.partial_invalidate(first_line, last_line, line_cache_shadow::STYLES_VALID);
     }
 
@@ -1319,7 +1319,7 @@ mod tests {
             s += "x";
         }
         s += "aaaaaa";
-        assert_eq!(view.find_in_progress(), false);
+        assert!(!view.find_in_progress());
 
         let text = Rope::from(&s);
         view.do_edit(
@@ -1332,7 +1332,7 @@ mod tests {
             },
         );
         view.do_find(&text);
-        assert_eq!(view.find_in_progress(), true);
+        assert!(view.find_in_progress());
         view.do_find_all(&text);
         assert_eq!(view.sel_regions().len(), 1);
         assert_eq!(
@@ -1340,7 +1340,7 @@ mod tests {
             Some(&SelRegion::new(FIND_BATCH_SIZE - 2, FIND_BATCH_SIZE + 6 - 2))
         );
         view.do_find(&text);
-        assert_eq!(view.find_in_progress(), true);
+        assert!(view.find_in_progress());
         view.do_find_all(&text);
         assert_eq!(view.sel_regions().len(), 2);
     }
@@ -1353,7 +1353,7 @@ mod tests {
             s += "£€äßß";
         }
 
-        assert_eq!(view.find_in_progress(), false);
+        assert!(!view.find_in_progress());
 
         let text = Rope::from(&s);
         view.do_edit(
@@ -1366,7 +1366,7 @@ mod tests {
             },
         );
         view.do_find(&text);
-        assert_eq!(view.find_in_progress(), true);
+        assert!(view.find_in_progress());
         view.do_find_all(&text);
         assert_eq!(view.sel_regions().len(), 1); // cursor
     }

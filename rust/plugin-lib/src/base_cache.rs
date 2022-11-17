@@ -364,8 +364,7 @@ impl ChunkCache {
             let split_idx = self
                 .line_offsets
                 .binary_search(&new_offsets[0])
-                .err()
-                .expect("new index cannot be occupied");
+                .expect_err("new index cannot be occupied");
 
             self.line_offsets =
                 [&self.line_offsets[..split_idx], &new_offsets, &self.line_offsets[split_idx..]]
@@ -475,7 +474,7 @@ mod tests {
         ) -> Result<GetDataResponse, Error> {
             let offset = unit
                 .resolve_offset(&self.0, start)
-                .ok_or(Error::Other("unable to resolve offset".into()))?;
+                .ok_or_else(|| Error::Other("unable to resolve offset".into()))?;
             let first_line = self.0.line_of_offset(offset);
             let first_line_offset = offset - self.0.offset_of_line(first_line);
             let end_off = (offset + CHUNK_SIZE).min(self.0.len());
@@ -492,9 +491,7 @@ mod tests {
 
     #[test]
     fn simple_chunk() {
-        let mut c = ChunkCache::default();
-        c.buf_size = 2;
-        c.contents = "oh".into();
+        let mut c = ChunkCache { buf_size: 2, contents: "oh".into(), ..Default::default() };
 
         let d = Delta::simple_edit(Interval::new(0, 0), "yay".into(), c.contents.len());
         c.update(Some(&d), d.new_document_len(), 1, 1);
@@ -524,9 +521,11 @@ mod tests {
     #[test]
     fn get_lines() {
         let remote_document = MockDataSource("this\nhas\nfour\nlines!".into());
-        let mut c = ChunkCache::default();
-        c.buf_size = remote_document.0.len();
-        c.num_lines = remote_document.0.measure::<LinesMetric>() + 1;
+        let mut c = ChunkCache {
+            buf_size: remote_document.0.len(),
+            num_lines: remote_document.0.measure::<LinesMetric>() + 1,
+            ..Default::default()
+        };
         assert_eq!(c.num_lines, 4);
         assert_eq!(c.buf_size, 20);
         assert_eq!(c.line_offsets.len(), 0);
@@ -545,9 +544,12 @@ mod tests {
     #[test]
     fn get_region() {
         let remote_document = MockDataSource("but\nthis big fella\nhas\nFIVE\nlines!".into());
-        let mut c = ChunkCache::default();
-        c.buf_size = remote_document.0.len();
-        c.num_lines = remote_document.0.measure::<LinesMetric>() + 1;
+        let mut c = ChunkCache {
+            buf_size: remote_document.0.len(),
+            num_lines: remote_document.0.measure::<LinesMetric>() + 1,
+            ..Default::default()
+        };
+
         assert_eq!(c.get_region(&remote_document, ..3).ok(), Some("but"));
         assert_eq!(c.get_region(&remote_document, 28..).ok(), Some("lines!"));
         assert!(c.offset > 0);
@@ -602,9 +604,8 @@ mod tests {
 
     #[test]
     fn simple_insert() {
-        let mut c = ChunkCache::default();
-        c.contents = "some".into();
-        c.buf_size = 4;
+        let mut c = ChunkCache { contents: "some".into(), buf_size: 4, ..Default::default() };
+
         let d =
             Delta::simple_edit(Interval::new(0, 0), "two\nline\nbreaks".into(), c.contents.len());
         assert!(d.as_simple_insert().is_some());
@@ -621,9 +622,12 @@ mod tests {
     #[test]
     fn offset_of_line() {
         let source = MockDataSource("this\nhas\nfour\nlines!".into());
-        let mut c = ChunkCache::default();
-        c.buf_size = source.0.len();
-        c.num_lines = source.0.measure::<LinesMetric>() + 1;
+        let mut c = ChunkCache {
+            buf_size: source.0.len(),
+            num_lines: source.0.measure::<LinesMetric>() + 1,
+            ..Default::default()
+        };
+
         assert_eq!(c.num_lines, 4);
         assert_eq!(c.cached_offset_of_line(0), Some(0));
         assert_eq!(c.offset_of_line(&source, 0).unwrap(), 0);
@@ -643,9 +647,7 @@ mod tests {
         // ensure that the manual num_lines we set below is the same we would
         // receive on the wire
         assert_eq!(Rope::from(&data.chunk).measure::<LinesMetric>() + 1, 4);
-        let mut c = ChunkCache::default();
-        c.buf_size = data.chunk.len();
-        c.num_lines = 4;
+        let mut c = ChunkCache { buf_size: data.chunk.len(), num_lines: 4, ..Default::default() };
         c.reset_chunk(data);
         assert_eq!(&c.contents, "zer\none\ntwo\ntri");
         assert_eq!(&c.line_offsets, &[4, 8, 12]);
@@ -682,9 +684,7 @@ mod tests {
         // ensure that the manual num_lines we set below is the same we would
         // receive on the wire
         assert_eq!(Rope::from(&data.chunk).measure::<LinesMetric>() + 1, 4);
-        let mut c = ChunkCache::default();
-        c.buf_size = data.chunk.len();
-        c.num_lines = 4;
+        let mut c = ChunkCache { buf_size: data.chunk.len(), num_lines: 4, ..Default::default() };
         c.reset_chunk(data);
 
         assert_eq!(&c.contents, "zer\none\ntwo\ntri");
@@ -729,8 +729,8 @@ mod tests {
     #[test]
     fn simple_edits_with_offset() {
         let mut source = MockDataSource("this\nhas\nfour\nlines!".into());
-        let mut c = ChunkCache::default();
-        c.buf_size = source.0.len();
+        let mut c = ChunkCache { buf_size: source.0.len(), ..Default::default() };
+
         c.num_lines = source.0.measure::<LinesMetric>() + 1;
         // get line fetches from source, starting at this line
         assert_eq!(c.get_line(&source, 2).ok(), Some("four\n"));
@@ -798,8 +798,7 @@ mod tests {
     fn get_big_line() {
         let test_str = "this\nhas one big line in the middle\nwow, multi-fetch!\nyay!";
         let source = MockDataSource(test_str.into());
-        let mut c = ChunkCache::default();
-        c.buf_size = source.0.len();
+        let mut c = ChunkCache { buf_size: source.0.len(), ..Default::default() };
         c.num_lines = source.0.measure::<LinesMetric>() + 1;
         assert_eq!(c.num_lines, 4);
         assert_eq!(c.get_line(&source, 0).unwrap(), "this\n");
@@ -827,15 +826,14 @@ mod tests {
         c.update(Some(&delta), base_document.len(), 4, 0);
         match c.get_line(&source, 4) {
             Err(Error::BadRequest) => (),
-            other => assert!(false, "expected BadRequest, found {:?}", other),
+            other => unreachable!("expected BadRequest, found {:?}", other),
         };
     }
 
     #[test]
     fn convert_lines_offsets() {
         let source = MockDataSource("this\nhas\nfour\nlines!".into());
-        let mut c = ChunkCache::default();
-        c.buf_size = source.0.len();
+        let mut c = ChunkCache { buf_size: source.0.len(), ..Default::default() };
         c.num_lines = source.0.measure::<LinesMetric>() + 1;
 
         assert_eq!(c.line_of_offset(&source, 0).unwrap(), 0);

@@ -108,7 +108,7 @@ pub struct CommandArgument {
     pub options: Option<Vec<ArgumentOption>>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
 pub enum ArgumentType {
     Number,
     Int,
@@ -118,14 +118,14 @@ pub enum ArgumentType {
     Choice,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
 /// Represents an option for a user-selectable argument.
 pub struct ArgumentOption {
     pub title: String,
     pub value: Value,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
 #[serde(rename_all = "snake_case")]
 /// A placeholder type which can represent a generic RPC.
 ///
@@ -137,7 +137,7 @@ pub struct PlaceholderRpc {
     pub rpc_type: RpcType,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum RpcType {
     Notification,

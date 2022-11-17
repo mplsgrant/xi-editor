@@ -18,7 +18,7 @@ extern crate xi_rope;
 use crate::xi_core::line_offset::LineOffset;
 use crate::xi_core::tabs::BufferId;
 use crate::xi_core::view::View;
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use criterion::{criterion_group, criterion_main, Criterion};
 use xi_rope::Rope;
 
 fn build_short_lines(n: usize) -> String {

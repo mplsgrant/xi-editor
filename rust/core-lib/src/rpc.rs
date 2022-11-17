@@ -230,7 +230,7 @@ pub enum CoreNotification {
 ///     other => panic!("Unexpected variant {:?}", other),
 /// }
 /// ```
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "method", content = "params")]
 pub enum CoreRequest {
@@ -278,7 +278,7 @@ pub enum CoreRequest {
 ///     other => panic!("Unexpected variant {:?}", other),
 /// }
 /// ```
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct EditCommand<T> {
     pub view_id: ViewId,
     pub cmd: T,
@@ -523,7 +523,7 @@ pub enum EditNotification {
 }
 
 /// The edit related requests.
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "method", content = "params")]
 pub enum EditRequest {
@@ -536,7 +536,7 @@ pub enum EditRequest {
 }
 
 /// The plugin related notifications.
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq)]
 #[serde(tag = "command")]
 #[serde(rename_all = "snake_case")]
 pub enum PluginNotification {
