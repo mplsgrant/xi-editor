@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#[cfg(all(target_family = "unix", not(target_os = "fuchsia")))]
+#[cfg(all(target_family = "unix"))]
 #[inline]
 pub fn current_pid() -> u64 {
     extern "C" {
@@ -20,12 +20,6 @@ pub fn current_pid() -> u64 {
     }
 
     unsafe { getpid() as u64 }
-}
-
-#[cfg(target_os = "fuchsia")]
-pub fn current_pid() -> u64 {
-    // TODO: implement for fuchsia (does getpid work?)
-    0
 }
 
 #[cfg(target_family = "windows")]

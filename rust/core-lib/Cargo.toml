@@ -29,19 +29,8 @@ version = "3.2"
 default-features = false
 features = ["assets","dump-load-rs","dump-create"]
 
-[target."cfg(target_os = \"fuchsia\")".dependencies]
-sha2 = "0.8"
-# Note: these can be available if needed, but the idea is that the
-# platform-specific code moves entirely to the binary wrapper that
-# includes xi-core-lib.
-#fuchsia-zircon = "0.3"
-#fuchsia-zircon-sys = "0.3"
-#mxruntime = "0.1.0"
-#fidl = "0.1.0"
-
 [dev-dependencies]
 tempdir = "^0.3.4"
 
 [features]
-ledger = []
 default = ["notify"]
