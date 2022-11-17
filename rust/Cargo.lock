@@ -2004,6 +2004,9 @@ dependencies = [
 [[package]]
 name = "xi-unicode"
 version = "0.3.0"
+dependencies = [
+ "criterion",
+]
 
 [[package]]
 name = "xml-rs"
