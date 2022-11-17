@@ -96,7 +96,7 @@ pub enum ReadError {
 /// let err = serde_json::from_str::<RemoteError>(&json).unwrap();
 /// assert_eq!(err, RemoteError::custom(404, "Not Found", None));
 /// ```
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum RemoteError {
     /// The JSON was valid, but was not a correctly formed request.
     ///

@@ -41,7 +41,7 @@ pub struct MessageReader(String);
 #[derive(Debug, Clone)]
 pub struct RpcObject(pub Value);
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 /// An RPC call, which may be either a notification or a request.
 pub enum Call<N, R> {
     /// An id and an RPC Request
