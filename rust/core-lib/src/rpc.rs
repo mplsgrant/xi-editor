@@ -35,7 +35,7 @@ use crate::view::Size;
 //  Command types
 // =============================================================================
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq)]
 #[doc(hidden)]
 pub struct EmptyStruct {}
 

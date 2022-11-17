@@ -31,6 +31,11 @@ features = ["assets","dump-load-rs","dump-create"]
 
 [dev-dependencies]
 tempdir = "^0.3.4"
+criterion = "0.4.0"
 
 [features]
 default = ["notify"]
+
+[[bench]]
+name = "wrap"
+harness = false
