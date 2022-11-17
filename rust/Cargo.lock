@@ -1887,6 +1887,7 @@ name = "xi-lang"
 version = "0.1.0"
 dependencies = [
  "combine",
+ "criterion",
  "nom 4.2.3",
  "pom",
  "regex",
