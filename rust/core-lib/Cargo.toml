@@ -15,7 +15,7 @@ serde_derive = "1.0.147"
 time = "0.3.17"
 toml = "0.5.9"
 notify = { optional = true, version = "5.0.0", features = ["crossbeam-channel"] }
-regex = "1.7.0"
+regex = "1.6.0"
 memchr = "2.5.0"
 crossbeam-channel = "0.3.0"
 
