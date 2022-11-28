@@ -36,13 +36,13 @@
 
 use notify::Config;
 use notify::{event::*, EventHandler, RecommendedWatcher, RecursiveMode, Watcher};
+
 use std::collections::VecDeque;
 use std::fmt;
 use std::mem;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 use std::thread;
-use std::time::Duration;
 
 use xi_rpc::RpcPeer;
 
@@ -111,13 +111,14 @@ impl FileWatcher {
         let state = Arc::new(Mutex::new(WatcherState::default()));
         let state_clone = state.clone();
 
-        let config = Config::default()
-            .with_compare_contents(false)
-            .with_poll_interval(Duration::from_millis(100));
-        let inner = Watcher::new(tx_event, config);
+        // let config = Config::default()
+        //     .with_compare_contents(false)
+        //     .with_poll_interval(Duration::from_millis(100));
+        let inner = RecommendedWatcher::new(tx_event, Config::default()).unwrap();
 
         thread::spawn(move || {
             while let Ok(Ok(event)) = rx_event.recv() {
+                println!("Got one event: {:?}", event);
                 let mut state = state_clone.lock().unwrap();
                 let WatcherState { ref mut events, ref mut watchees } = *state;
 
@@ -130,7 +131,7 @@ impl FileWatcher {
                 peer.notify();
             }
         });
-        let inner = inner.unwrap();
+
         FileWatcher { inner, state }
     }
 
