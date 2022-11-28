@@ -8,10 +8,10 @@ description = "A language syntax coloring and indentation plugin for xi-editor."
 edition = '2018'
 
 [dependencies]
-pom = { version = "3.0", optional = true }
-regex = { version = "1.0", optional = true }
-nom = { version = "4.2", optional = true }
-combine = { version = "3.8", optional = true }
+pom = { version = "3.2.0", optional = true }
+regex = { version = "1.7.0", optional = true }
+nom = { version = "4.2", optional = true } # TODO upgrade to major version
+combine = { version = "3.8", optional = true } # TODO upgrade to major version
 
 [dependencies.xi-plugin-lib]
 path = "../../plugin-lib"

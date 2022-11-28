@@ -203,7 +203,7 @@ dependencies = [
  "js-sys",
  "num-integer",
  "num-traits",
- "time",
+ "time 0.1.44",
  "wasm-bindgen",
  "winapi 0.3.9",
 ]
@@ -513,16 +513,6 @@ dependencies = [
 
 [[package]]
 name = "fern"
-version = "0.5.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e69ab0d5aca163e388c3a49d284fed6c3d0810700e77c5ae2756a50ec1a4daaa"
-dependencies = [
- "chrono",
- "log",
-]
-
-[[package]]
-name = "fern"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3bdd7b0849075e79ee9a1836df22c717d1eba30451796fdc631b04565dd11e2a"
@@ -771,9 +761,9 @@ dependencies = [
 
 [[package]]
 name = "jsonrpc-lite"
-version = "0.5.0"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a98d245f26984add78277a5306ca0cf774863d4eddb4912b31d94ee3fa1a22d4"
+checksum = "bb4128aba82294c14af2998831c4df3c843940e92b5cfc41bac1229d1e63b88c"
 dependencies = [
  "serde",
  "serde_derive",
@@ -1622,6 +1612,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "time"
+version = "0.3.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a561bf4617eebd33bca6434b988f39ed798e527f51a1e797d0ee4f61c0a38376"
+dependencies = [
+ "serde",
+ "time-core",
+]
+
+[[package]]
+name = "time-core"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2e153e1f1acaef8acc537e68b44906d2db6436e2b35ac2c6b42640fff91f00fd"
+
+[[package]]
 name = "tinytemplate"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1952,7 +1958,7 @@ version = "0.4.0"
 dependencies = [
  "chrono",
  "dirs",
- "fern 0.6.1",
+ "fern",
  "log",
  "serde",
  "serde_json",
@@ -1975,7 +1981,7 @@ dependencies = [
  "serde_json",
  "syntect",
  "tempdir",
- "time",
+ "time 0.3.17",
  "toml",
  "xi-rope",
  "xi-rpc",
@@ -2003,7 +2009,7 @@ name = "xi-lsp-lib"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "fern 0.5.9",
+ "fern",
  "jsonrpc-lite",
  "log",
  "lsp-types",
@@ -2099,7 +2105,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
- "time",
+ "time 0.1.44",
 ]
 
 [[package]]

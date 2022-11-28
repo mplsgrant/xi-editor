@@ -8,16 +8,16 @@ repository = "https://github.com/google/xi-editor"
 edition = '2018'
 
 [dependencies]
-log = "0.4.3"
-serde = { version = "1.0", features = ["rc"] }
-serde_json = "1.0"
-serde_derive = "1.0"
-time = "0.1"
-toml = "0.5"
+log = "0.4.17"
+serde = { version = "1.0.147", features = ["rc"] }
+serde_json = "1.0.87"
+serde_derive = "1.0.147"
+time = "0.3.17"
+toml = "0.5.9"
 notify = { optional = true, version = "=5.0.0-pre.1" }
-regex = "1.0"
-memchr = "2.0.1"
-crossbeam-channel = "0.3"
+regex = "1.7.0"
+memchr = "2.5.0"
+crossbeam-channel = "0.3.0"
 
 xi-trace = { path = "../trace", version = "0.2.0" }
 xi-rope = { path = "../rope", version = "0.3", features = ["serde"] }
@@ -25,12 +25,12 @@ xi-unicode = { path = "../unicode", version = "0.3.0" }
 xi-rpc = { path = "../rpc", version = "0.3.0" }
 
 [dependencies.syntect]
-version = "3.2"
+version = "3.2" # Upgrade to major version
 default-features = false
 features = ["assets","dump-load-rs","dump-create"]
 
 [dev-dependencies]
-tempdir = "^0.3.4"
+tempdir = "^0.3.7"
 criterion = "0.4.0"
 
 [features]
