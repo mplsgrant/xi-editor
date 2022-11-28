@@ -34,8 +34,8 @@
 //! - We are integrated with the xi_rpc runloop; events are queued as
 //! they arrive, and an idle task is scheduled.
 
-use crossbeam_channel::unbounded;
-use notify::{event::*, watcher, RecommendedWatcher, RecursiveMode, Watcher};
+use notify::Config;
+use notify::{event::*, EventHandler, RecommendedWatcher, RecursiveMode, Watcher};
 use std::collections::VecDeque;
 use std::fmt;
 use std::mem;
@@ -91,14 +91,30 @@ pub type EventQueue = VecDeque<(WatchToken, Event)>;
 
 pub type PathFilter = dyn Fn(&Path) -> bool + Send + 'static;
 
+// Workaround to satisfy Wacher::new
+pub struct WrappedChannel {
+    pub channel: crossbeam_channel::Sender<notify::Result<Event>>,
+}
+
+impl EventHandler for WrappedChannel {
+    // aken from notify's lib.rs: impl EventHandler for crossbeam_channel::Sender<Result<Event>>
+    fn handle_event(&mut self, event: notify::Result<Event>) {
+        let _ = self.channel.send(event);
+    }
+}
+
 impl FileWatcher {
     pub fn new<T: Notify + 'static>(peer: T) -> Self {
-        let (tx_event, rx_event) = unbounded();
+        let (tx_event, rx_event) = crossbeam_channel::unbounded::<notify::Result<notify::Event>>();
+        let tx_event = WrappedChannel { channel: tx_event };
 
         let state = Arc::new(Mutex::new(WatcherState::default()));
         let state_clone = state.clone();
 
-        let inner = watcher(tx_event, Duration::from_millis(100)).expect("watcher should spawn");
+        let config = Config::default()
+            .with_compare_contents(false)
+            .with_poll_interval(Duration::from_millis(100));
+        let inner = Watcher::new(tx_event, config);
 
         thread::spawn(move || {
             while let Ok(Ok(event)) = rx_event.recv() {
@@ -114,7 +130,7 @@ impl FileWatcher {
                 peer.notify();
             }
         });
-
+        let inner = inner.unwrap();
         FileWatcher { inner, state }
     }
 
@@ -465,9 +481,18 @@ mod tests {
     #[test]
     #[cfg(unix)]
     fn test_crash_repro() {
-        let (tx, _rx) = unbounded();
+        use notify::INotifyWatcher;
+
+        let (tx_event, _) = crossbeam_channel::unbounded::<notify::Result<notify::Event>>();
+        let tx_event = WrappedChannel { channel: tx_event };
+
         let path = PathBuf::from("/bin/cat");
-        let mut w = watcher(tx, Duration::from_secs(1)).unwrap();
+
+        let config = Config::default()
+            .with_compare_contents(true)
+            .with_poll_interval(Duration::from_millis(1000));
+        let mut w: INotifyWatcher = Watcher::new(tx_event, config).unwrap();
+
         w.watch(&path, RecursiveMode::NonRecursive).unwrap();
         sleep(20);
         w.watch(&path, RecursiveMode::NonRecursive).unwrap();
@@ -497,7 +522,7 @@ mod tests {
                     2.into(),
                     Event::new(EventKind::Modify(ModifyKind::Any))
                         .add_path(tmp.mkpath("adir/dir2/file"))
-                        .set_flag(Flag::Notice)
+                        .set_flag(Flag::Rescan)
                 ),
                 (
                     2.into(),
@@ -530,13 +555,13 @@ mod tests {
                     1.into(),
                     Event::new(EventKind::Modify(ModifyKind::Any))
                         .add_path(tmp.mkpath("my_file"))
-                        .set_flag(Flag::Notice)
+                        .set_flag(Flag::Rescan)
                 ),
                 (
                     2.into(),
                     Event::new(EventKind::Modify(ModifyKind::Any))
                         .add_path(tmp.mkpath("my_file"))
-                        .set_flag(Flag::Notice)
+                        .set_flag(Flag::Rescan)
                 ),
                 (
                     1.into(),
@@ -562,11 +587,11 @@ mod tests {
             2.into(),
             Event::new(EventKind::Remove(RemoveKind::Any))
                 .add_path(path.clone())
-                .set_flag(Flag::Notice)
+                .set_flag(Flag::Rescan)
         )));
         assert!(!events.contains(&(
             1.into(),
-            Event::new(EventKind::Remove(RemoveKind::Any)).add_path(path).set_flag(Flag::Notice)
+            Event::new(EventKind::Remove(RemoveKind::Any)).add_path(path).set_flag(Flag::Rescan)
         )));
     }
 }
