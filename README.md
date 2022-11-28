@@ -1,3 +1,15 @@
+<h1>
+xi-editor: a life support fork
+</h1>
+
+<p>
+Q: Why does this fork exist?
+
+A: This fork of the xi-editor codebase aims to make the xi-editor usable for me in various side-projects, but I do not plan on resurrecting xi-editor as such (hence "life support").
+</p>
+
+<hr>
+
 <h1 align="center">
   <a href="https://github.com/xi-editor/xi-editor"><img src="icons/xi-editor.png" alt="Xi Editor" width="256" height="256"/></a><br>
   <a href="https://github.com/xi-editor/xi-editor">Xi Editor</a>
